@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 
 
 use App\Http\Controllers\FakeEmailController;
+use App\Http\Controllers\SavedEmailController;
+
+// Save email routes
+Route::post('/save-email', [SavedEmailController::class, 'saveEmail']);
+Route::get('/saved/{token}', [SavedEmailController::class, 'getSavedEmail']);
+Route::post('/check-saved', [SavedEmailController::class, 'checkSaved']);
 
 Route::post('/fakeemails', [FakeEmailController::class, 'store']);
 Route::get('/fakeemails', [FakeEmailController::class, 'index']);
+
+
