@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempMail Pro - Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+        }
+        .split-layout {
+            height: calc(100vh - 60px);
+        }
+        @media (max-width: 768px) {
+            .split-layout {
+                height: auto;
+                flex-direction: column;
+            }
+        }
+        .refresh-animate {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .email-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .email-content.expanded {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        @media (min-width: 1536px) {
+    .container {
+        max-width: 1000px !important;
+    }
+}
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Compact Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1 class="text-xl font-bold">TempMail Pro</h1>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="refresh-btn" class="text-white hover:text-gray-200">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button id="settings-btn" class="text-white hover:text-gray-200">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <main class="container mx-auto px-4">
+        <div class="flex split-layout">
+            <!-- Left Panel - Email Control -->
+            <div class="w-full md:w-1/3 bg-white p-4 border-r border-gray-200">
+                <div class="sticky top-4">
+                    <h2 class="text-lg font-semibold mb-4">Your Temporary Email</h2>
+                    
+                    <!-- Email Address Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <input type="text" id="email-address" value="loading..." 
+                                   class="bg-transparent border-none w-full font-mono text-blue-800 focus:outline-none" readonly>
+                            <button id="copy-email" class="text-blue-500 hover:text-blue-700 ml-2">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button id="refresh-inbox" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm flex items-center">
+                            <i class="fas fa-redo-alt mr-1 text-xs"></i> Refresh
+                        </button>
+                        <button id="new-email" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-lg text-sm flex items-center">
+                            <i class="fas fa-plus mr-1 text-xs"></i> New
+                        </button>
+                        <button id="forward-email" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-lg text-sm flex items-center">
+                            <i class="fas fa-forward mr-1 text-xs"></i> Forward
+                        </button>
+                    
+                    </div>
+                    
+      
+                    
+       
+                    
+                    <!-- Settings Panel (Initially Hidden) -->
+                    <div id="settings-panel" class="hidden mt-6 border-t pt-4">
+                        <h3 class="font-medium mb-2">Settings</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Dark Mode</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="dark-mode" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Auto-refresh (seconds)</span>
+                                <input type="number" id="refresh-interval" min="5" max="300" value="30" 
+                                       class="w-16 border border-gray-300 rounded px-2 py-1 text-sm">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Notification Sound</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notification-sound" checked class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Inbox -->
+            <div class="w-full md:w-2/3 bg-gray-50 p-4 overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Inbox</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-500">Auto-refresh: </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="auto-refresh" checked class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Email List Container -->
+                <div id="email-list" class="space-y-2">
+                    <!-- Emails will be loaded here by JavaScript -->
+                    <div class="text-center py-10 text-gray-500" id="empty-inbox">
+                        <i class="fas fa-inbox text-4xl mb-2"></i>
+                        <p>Your inbox is empty</p>
+                        <p class="text-sm mt-1">New emails will appear here automatically</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Email Forwarding -->
+    <div id="forward-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Forward Email</h3>
+                <button id="close-forward" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+                    <input type="text" id="forward-from" class="w-full border border-gray-300 rounded px-3 py-2" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                    <input type="email" id="forward-to" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="recipient@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <input type="text" id="forward-subject" class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                    <textarea id="forward-message" class="w-full border border-gray-300 rounded px-3 py-2" rows="4"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-forward" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                        Cancel
+                    </button>
+                    <button id="send-forward" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Email Address -->
+    <div id="new-email-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Create New Email</h3>
+                <button id="close-new-email" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <div class="flex">
+                        <input type="text" id="new-email-username" class="flex-1 border border-gray-300 rounded-l px-3 py-2" placeholder="username">
+                        <select id="new-email-domain" class="border border-gray-300 rounded-r px-3 py-2 bg-white">
+                            <option value="@tempshield.com">@tempshield.com</option>
+                            <option value="@mailtmp.net">@mailtmp.net</option>
+                            <option value="@secureinbox.me">@secureinbox.me</option>
+                            <option value="@shieldtemp.com">@shieldtemp.com</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="auto-generate" class="mr-2" checked>
+                    <label for="auto-generate" class="text-sm">Auto-generate random username</label>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-new-email" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                        Cancel
+                    </button>
+                    <button id="create-new-email" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio for notifications (hidden) -->
+    <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+
+    <script>
+        // App State
+        const state = {
+            currentEmail: '',
+            emails: [],
+            domains: ['@tempshield.com', '@mailtmp.net', '@secureinbox.me', '@shieldtemp.com'],
+            activeEmails: [],
+            autoRefresh: true,
+            refreshInterval: 30000, // 30 seconds
+            refreshTimer: null,
+            settings: {
+                darkMode: false,
+                notificationSound: true
+            }
+        };
+
+        // DOM Elements
+        const elements = {
+            emailAddress: document.getElementById('email-address'),
+            copyEmail: document.getElementById('copy-email'),
+            refreshBtn: document.getElementById('refresh-btn'),
+            refreshInbox: document.getElementById('refresh-inbox'),
+            newEmail: document.getElementById('new-email'),
+            forwardEmail: document.getElementById('forward-email'),
+            deleteAll: document.getElementById('delete-all'),
+            activeCount: document.getElementById('active-count'),
+            todayCount: document.getElementById('today-count'),
+            totalCount: document.getElementById('total-count'),
+            domainButtons: document.getElementById('domain-buttons'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsPanel: document.getElementById('settings-panel'),
+            darkMode: document.getElementById('dark-mode'),
+            refreshInterval: document.getElementById('refresh-interval'),
+            notificationSound: document.getElementById('notification-sound'),
+            autoRefresh: document.getElementById('auto-refresh'),
+            emailList: document.getElementById('email-list'),
+            emptyInbox: document.getElementById('empty-inbox'),
+            forwardModal: document.getElementById('forward-modal'),
+            closeForward: document.getElementById('close-forward'),
+            cancelForward: document.getElementById('cancel-forward'),
+            sendForward: document.getElementById('send-forward'),
+            forwardFrom: document.getElementById('forward-from'),
+            forwardTo: document.getElementById('forward-to'),
+            forwardSubject: document.getElementById('forward-subject'),
+            forwardMessage: document.getElementById('forward-message'),
+            newEmailModal: document.getElementById('new-email-modal'),
+            closeNewEmail: document.getElementById('close-new-email'),
+            cancelNewEmail: document.getElementById('cancel-new-email'),
+            createNewEmail: document.getElementById('create-new-email'),
+            newEmailUsername: document.getElementById('new-email-username'),
+            newEmailDomain: document.getElementById('new-email-domain'),
+            autoGenerate: document.getElementById('auto-generate'),
+            notificationAudio: document.getElementById('notification-sound')
+        };
+
+        // Initialize the app
+        function init() {
+            // Generate a random email address
+            generateNewEmail();
+            
+            // Setup domain buttons
+            setupDomainButtons();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Start auto-refresh
+            startAutoRefresh();
+            
+            // Load some sample emails
+            setTimeout(loadSampleEmails, 1500);
+        }
+
+        // Generate a new random email address
+        function generateNewEmail() {
+            const randomString = Math.random().toString(36).substring(2, 10);
+            const randomDomain = state.domains[Math.floor(Math.random() * state.domains.length)];
+            state.currentEmail = `${randomString}${randomDomain}`;
+            elements.emailAddress.value = state.currentEmail;
+            
+            // Add to active emails if not already there
+            if (!state.activeEmails.includes(state.currentEmail)) {
+                state.activeEmails.push(state.currentEmail);
+                updateStats();
+            }
+        }
+
+        // Setup domain selection buttons
+        function setupDomainButtons() {
+            elements.domainButtons.innerHTML = '';
+            state.domains.forEach(domain => {
+                const button = document.createElement('button');
+                button.className = 'bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 rounded text-xs';
+                button.textContent = domain;
+                button.addEventListener('click', () => {
+                    // Change domain for current email
+                    const username = state.currentEmail.split('@')[0];
+                    state.currentEmail = `${username}${domain}`;
+                    elements.emailAddress.value = state.currentEmail;
+                    
+                    // Update active emails
+                    const index = state.activeEmails.findIndex(email => email.startsWith(username + '@'));
+                    if (index !== -1) {
+                        state.activeEmails[index] = state.currentEmail;
+                    } else {
+                        state.activeEmails.push(state.currentEmail);
+                    }
+                    updateStats();
+                });
+                elements.domainButtons.appendChild(button);
+            });
+        }
+
+        // Update statistics display
+        function updateStats() {
+            elements.activeCount.textContent = state.activeEmails.length;
+            elements.todayCount.textContent = state.emails.filter(email => {
+                return new Date(email.date).toDateString() === new Date().toDateString();
+            }).length;
+            elements.totalCount.textContent = state.emails.length;
+        }
+
+        // Load some sample emails
+        function loadSampleEmails() {
+            const sampleEmails = [
+                {
+                    id: 1,
+                    from: 'welcome@tempshield.com',
+                    to: state.currentEmail,
+                    subject: 'Welcome to TempMail Pro',
+                    body: 'Thank you for choosing TempMail Pro for your temporary email needs. This service allows you to create disposable email addresses that automatically expire after a certain period. You can use these addresses to sign up for services without revealing your real email address.\n\nEnjoy your stay!',
+                    date: new Date(),
+                    read: false,
+                    type: 'welcome'
+                },
+                {
+                    id: 2,
+                    from: 'notifications@eventbrite.com',
+                    to: state.currentEmail,
+                    subject: 'Your Event Registration Confirmation',
+                    body: 'Thank you for registering for TechConf 2023! Your registration has been confirmed.\n\nEvent Details:\nDate: November 15-17, 2023\nLocation: San Francisco Convention Center\n\nPlease present this confirmation at the registration desk.',
+                    date: new Date(Date.now() - 3600000),
+                    read: false,
+                    type: 'event'
+                },
+                {
+                    id: 3,
+                    from: 'no-reply@amazon.com',
+                    to: state.currentEmail,
+                    subject: 'Your Amazon Order #123-456789',
+                    body: 'Thank you for your order!\n\nItems ordered:\n1. Wireless Headphones - $99.99\n2. USB-C Cable - $12.99\n\nTotal: $112.98\n\nExpected delivery: Friday, June 10',
+                    date: new Date(Date.now() - 86400000),
+                    read: false,
+                    type: 'shopping'
+                }
+            ];
+            
+            state.emails = sampleEmails;
+            renderEmails();
+            updateStats();
+            
+            // Play notification sound if enabled
+            if (state.settings.notificationSound) {
+                elements.notificationAudio.play();
+            }
+        }
+
+        // Render emails in the inbox
+        function renderEmails() {
+            if (state.emails.length === 0) {
+                elements.emptyInbox.classList.remove('hidden');
+                elements.emailList.innerHTML = '';
+                elements.emailList.appendChild(elements.emptyInbox);
+                return;
+            }
+            
+            elements.emptyInbox.classList.add('hidden');
+            elements.emailList.innerHTML = '';
+            
+            // Sort emails by date (newest first)
+            const sortedEmails = [...state.emails].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedEmails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = `email-item bg-white p-3 rounded-lg border border-gray-200 cursor-pointer ${email.read ? '' : 'font-semibold'}`;
+                emailItem.dataset.id = email.id;
+                
+                // Get icon and color based on email type
+                let icon, bgColor, textColor;
+                switch(email.type) {
+                    case 'welcome':
+                        icon = 'fa-envelope';
+                        bgColor = 'bg-blue-100';
+                        textColor = 'text-blue-800';
+                        break;
+                    case 'event':
+                        icon = 'fa-ticket-alt';
+                        bgColor = 'bg-green-100';
+                        textColor = 'text-green-800';
+                        break;
+                    case 'shopping':
+                        icon = 'fa-shopping-cart';
+                        bgColor = 'bg-yellow-100';
+                        textColor = 'text-yellow-800';
+                        break;
+                    default:
+                        icon = 'fa-envelope';
+                        bgColor = 'bg-gray-100';
+                        textColor = 'text-gray-800';
+                }
+                
+                emailItem.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 ${bgColor} ${textColor} rounded-full w-8 h-8 flex items-center justify-center mt-1">
+                            <i class="fas ${icon} text-sm"></i>
+                        </div>
+                        <div class="ml-3 flex-1 min-w-0">
+                            <div class="flex justify-between">
+                                <p class="text-sm ${email.read ? 'text-gray-900' : 'text-gray-900'} truncate">${email.subject}</p>
+                                <span class="text-xs text-gray-500">${formatDate(email.date)}</span>
+                            </div>
+                            <p class="text-xs ${email.read ? 'text-gray-500' : 'text-gray-600'} truncate">${email.from}</p>
+                        </div>
+                    </div>
+                    <div class="email-content mt-2 pl-11">
+                        <div class="text-xs text-gray-500 mb-2">To: ${email.to}</div>
+                        <div class="text-sm text-gray-700 whitespace-pre-line">${email.body}</div>
+                        <div class="mt-3 flex justify-end space-x-2">
+                            <button class="forward-btn px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">
+                                <i class="fas fa-forward mr-1"></i> Forward
+                            </button>
+                            <button class="delete-btn px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-800 rounded">
+                                <i class="fas fa-trash-alt mr-1"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                elements.emailList.appendChild(emailItem);
+                
+                // Add click event to toggle email content
+                const header = emailItem.firstElementChild;
+                const content = emailItem.querySelector('.email-content');
+                
+                header.addEventListener('click', () => {
+                    content.classList.toggle('expanded');
+                    email.read = true;
+                    emailItem.classList.remove('font-semibold');
+                    header.querySelector('p').classList.remove('text-gray-900');
+                    header.querySelector('p').classList.add('text-gray-900');
+                    header.querySelector('p:last-child').classList.remove('text-gray-600');
+                    header.querySelector('p:last-child').classList.add('text-gray-500');
+                });
+                
+                // Add event for forward button
+                const forwardBtn = emailItem.querySelector('.forward-btn');
+                forwardBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openForwardModal(email);
+                });
+                
+                // Add event for delete button
+                const deleteBtn = emailItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteEmail(email.id);
+                });
+            });
+        }
+
+        // Format date for display
+        function formatDate(date) {
+            const now = new Date();
+            const emailDate = new Date(date);
+            const diffInHours = (now - emailDate) / (1000 * 60 * 60);
+            
+            if (diffInHours < 1) {
+                const minutes = Math.floor(diffInHours * 60);
+                return `${minutes} min ago`;
+            } else if (diffInHours < 24) {
+                const hours = Math.floor(diffInHours);
+                return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+            } else {
+                return emailDate.toLocaleDateString();
+            }
+        }
+
+        // Open forward modal with email data
+        function openForwardModal(email) {
+            elements.forwardFrom.value = email.to;
+            elements.forwardTo.value = '';
+            elements.forwardSubject.value = `Fwd: ${email.subject}`;
+            elements.forwardMessage.value = `---------- Forwarded message ---------\nFrom: ${email.from}\nDate: ${email.date.toLocaleString()}\nSubject: ${email.subject}\n\n${email.body}`;
+            elements.forwardModal.classList.remove('hidden');
+        }
+
+        // Delete an email
+        function deleteEmail(id) {
+            state.emails = state.emails.filter(email => email.id !== id);
+            renderEmails();
+            updateStats();
+        }
+
+        // Start auto-refresh timer
+        function startAutoRefresh() {
+            if (state.refreshTimer) {
+                clearInterval(state.refreshTimer);
+            }
+            
+            if (state.autoRefresh) {
+                state.refreshTimer = setInterval(() => {
+                    refreshEmails();
+                }, state.refreshInterval);
+            }
+        }
+
+        // Refresh emails (simulated)
+        function refreshEmails() {
+            elements.refreshBtn.classList.add('refresh-animate');
+            
+            // Simulate network delay
+            setTimeout(() => {
+                // In a real app, this would fetch new emails from server
+                const hasNewEmails = Math.random() > 0.5;
+                
+                if (hasNewEmails) {
+                    const newEmail = {
+                        id: Date.now(),
+                        from: `service${Math.floor(Math.random() * 10)}@example.com`,
+                        to: state.currentEmail,
+                        subject: `Your ${Math.random() > 0.5 ? 'verification' : 'notification'} code`,
+                        body: `Your ${Math.random() > 0.5 ? 'verification' : 'authentication'} code is: ${Math.floor(100000 + Math.random() * 900000)}\n\nThis code will expire in 10 minutes.`,
+                        date: new Date(),
+                        read: false,
+                        type: 'notification'
+                    };
+                    
+                    state.emails.unshift(newEmail);
+                    renderEmails();
+                    updateStats();
+                    
+                    // Play notification sound if enabled
+                    if (state.settings.notificationSound) {
+                        elements.notificationAudio.play();
+                    }
+                }
+                
+                elements.refreshBtn.classList.remove('refresh-animate');
+            }, 1000);
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Copy email address
+            elements.copyEmail.addEventListener('click', () => {
+                elements.emailAddress.select();
+                document.execCommand('copy');
+                
+                const originalIcon = elements.copyEmail.innerHTML;
+                elements.copyEmail.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    elements.copyEmail.innerHTML = originalIcon;
+                }, 2000);
+            });
+            
+            // Refresh buttons
+            elements.refreshBtn.addEventListener('click', refreshEmails);
+            elements.refreshInbox.addEventListener('click', refreshEmails);
+            
+            // New email button
+            elements.newEmail.addEventListener('click', () => {
+                elements.newEmailModal.classList.remove('hidden');
+                if (elements.autoGenerate.checked) {
+                    elements.newEmailUsername.value = Math.random().toString(36).substring(2, 10);
+                }
+            });
+            
+            // Forward email button
+            elements.forwardEmail.addEventListener('click', () => {
+                if (state.emails.length === 0) {
+                    alert('No emails to forward');
+                    return;
+                }
+                openForwardModal(state.emails[0]);
+            });
+            
+            // Delete all button
+            elements.deleteAll.addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete all emails?')) {
+                    state.emails = [];
+                    renderEmails();
+                    updateStats();
+                }
+            });
+            
+            // Settings button
+            elements.settingsBtn.addEventListener('click', () => {
+                elements.settingsPanel.classList.toggle('hidden');
+            });
+            
+            // Dark mode toggle
+            elements.darkMode.addEventListener('change', (e) => {
+                state.settings.darkMode = e.target.checked;
+                document.body.classList.toggle('bg-gray-900', state.settings.darkMode);
+                document.body.classList.toggle('text-white', state.settings.darkMode);
+            });
+            
+            // Refresh interval change
+            elements.refreshInterval.addEventListener('change', (e) => {
+                state.refreshInterval = e.target.value * 1000;
+                startAutoRefresh();
+            });
+            
+            // Notification sound toggle
+            elements.notificationSound.addEventListener('change', (e) => {
+                state.settings.notificationSound = e.target.checked;
+            });
+            
+            // Auto-refresh toggle
+            elements.autoRefresh.addEventListener('change', (e) => {
+                state.autoRefresh = e.target.checked;
+                startAutoRefresh();
+            });
+            
+            // Forward modal buttons
+            elements.closeForward.addEventListener('click', () => {
+                elements.forwardModal.classList.add('hidden');
+            });
+            
+            elements.cancelForward.addEventListener('click', () => {
+                elements.forwardModal.classList.add('hidden');
+            });
+            
+            elements.sendForward.addEventListener('click', () => {
+                alert('Email forwarded successfully! (This is a demo)');
+                elements.forwardModal.classList.add('hidden');
+            });
+            
+            // New email modal buttons
+            elements.closeNewEmail.addEventListener('click', () => {
+                elements.newEmailModal.classList.add('hidden');
+            });
+            
+            elements.cancelNewEmail.addEventListener('click', () => {
+                elements.newEmailModal.classList.add('hidden');
+            });
+            
+            elements.createNewEmail.addEventListener('click', () => {
+                const username = elements.newEmailUsername.value.trim();
+                const domain = elements.newEmailDomain.value;
+                
+                if (!username) {
+                    alert('Please enter a username');
+                    return;
+                }
+                
+                state.currentEmail = `${username}${domain}`;
+                elements.emailAddress.value = state.currentEmail;
+                
+                // Add to active emails if not already there
+                if (!state.activeEmails.some(email => email.startsWith(username + '@'))) {
+                    state.activeEmails.push(state.currentEmail);
+                    updateStats();
+                }
+                
+                elements.newEmailModal.classList.add('hidden');
+            });
+            
+            // Auto-generate username toggle
+            elements.autoGenerate.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    elements.newEmailUsername.value = Math.random().toString(36).substring(2, 10);
+                    elements.newEmailUsername.disabled = true;
+                } else {
+                    elements.newEmailUsername.disabled = false;
+                    elements.newEmailUsername.value = '';
+                }
+            });
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

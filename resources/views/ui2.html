@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureMail - Advanced Temporary Email</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .timer-circle {
+            stroke-dasharray: 188;
+            stroke-dashoffset: 188;
+            animation: countdown 600s linear infinite;
+        }
+        
+        @keyframes countdown {
+            from { stroke-dashoffset: 188; }
+            to { stroke-dashoffset: 0; }
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .floating-element {
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(180deg); }
+        }
+        
+        .copy-success {
+            animation: copySuccess 0.3s ease-out;
+        }
+        
+        @keyframes copySuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="floating-element absolute top-16 left-10 w-20 h-20 bg-white opacity-10 rounded-full"></div>
+        <div class="floating-element absolute top-32 right-16 w-16 h-16 bg-white opacity-10 rounded-full" style="animation-delay: -3s;"></div>
+        <div class="floating-element absolute bottom-32 left-1/4 w-24 h-24 bg-white opacity-10 rounded-full" style="animation-delay: -6s;"></div>
+        <div class="floating-element absolute bottom-16 right-1/3 w-12 h-12 bg-white opacity-10 rounded-full" style="animation-delay: -1s;"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="flex items-center justify-center min-h-screen p-3 sm:p-6">
+        <div class="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-8 w-full max-w-7xl">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4 sm:mb-8">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-lg sm:text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-3xl font-bold text-gray-800">SecureMail</h1>
+                        <p class="text-xs sm:text-sm text-gray-600 hidden sm:block">Temporary Email Generator</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <div class="flex items-center space-x-1 sm:space-x-2 bg-green-100 px-2 sm:px-3 py-1 rounded-full">
+                        <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></div>
+                        <span class="text-xs sm:text-sm font-medium text-green-700">Online</span>
+                    </div>
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm text-gray-500">Session Protected</p>
+                        <p class="text-xs text-gray-400">256-bit Encryption</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Layout -->
+            <div class="block lg:hidden space-y-4">
+                <!-- Mobile Email Generator -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus text-white text-xs"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">Generate Email</h3>
+                    </div>
+                    
+                    <!-- Email Display -->
+                    <div class="bg-white rounded-xl p-3 mb-4 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0 pr-2">
+                                <p class="text-xs text-gray-500 mb-1">Your temporary email:</p>
+                                <div id="emailDisplayMobile" class="text-sm font-mono text-gray-800 break-all">
+                                    Click generate to create email
+                                </div>
+                            </div>
+                            <button id="copyBtnMobile" class="p-2 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0" disabled>
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Timer & Controls -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="relative">
+                                <svg class="w-10 h-10 transform -rotate-90">
+                                    <circle cx="20" cy="20" r="16" stroke="#e5e7eb" stroke-width="3" fill="none"/>
+                                    <circle id="timerCircleMobile" cx="20" cy="20" r="16" stroke="#3b82f6" stroke-width="3" fill="none" class="timer-circle"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="timerDisplayMobile" class="text-xs font-bold text-gray-700">10:00</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Duration:</p>
+                                <div class="flex space-x-1">
+                                    <button class="duration-btn-mobile px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-700 border border-indigo-200" data-duration="10">10m</button>
+                                    <button class="duration-btn-mobile px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-200" data-duration="30">30m</button>
+                                    <button class="duration-btn-mobile px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-200" data-duration="60">1h</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-blue-600 font-medium" id="emailCountMobile">0 emails</span>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-xs text-green-600 font-medium" id="spamCountMobile">0 spam</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="generateBtnMobile" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all">
+                            <i class="fas fa-plus mr-1"></i>Generate
+                        </button>
+                        <button id="refreshBtnMobile" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all" disabled>
+                            <i class="fas fa-sync mr-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Inbox -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-inbox text-white text-xs"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Inbox</h3>
+                        </div>
+                        <button class="text-xs text-blue-600 hover:text-blue-700 font-medium" id="refreshInboxBtnMobile">
+                            <i class="fas fa-sync mr-1"></i>Refresh
+                        </button>
+                    </div>
+                    
+                    <!-- Email List -->
+                    <div class="max-h-64 overflow-y-auto" id="emailListMobile">
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-2xl mb-2 opacity-50"></i>
+                            <p class="text-sm">No emails yet</p>
+                            <p class="text-xs opacity-75">Generate an email to start</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Layout -->
+            <div class="hidden lg:grid grid-cols-12 gap-8" style="height: 400px;">
+                <!-- Left Column - Email Generator -->
+                <div class="col-span-4 space-y-6">
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 h-full flex flex-col">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-plus text-white text-sm"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800">Generate Email</h3>
+                        </div>
+                        
+                        <!-- Email Display -->
+                        <div class="bg-white rounded-xl p-4 mb-4 border border-gray-200 flex-1">
+                            <div class="flex items-center justify-between h-full">
+                                <div class="flex-1">
+                                    <p class="text-xs text-gray-500 mb-2">Your temporary email:</p>
+                                    <div id="emailDisplay" class="text-sm font-mono text-gray-800 break-all">
+                                        Click generate to create email
+                                    </div>
+                                </div>
+                                <button id="copyBtn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors ml-2" disabled>
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Timer & Duration -->
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="relative">
+                                <svg class="w-12 h-12 transform -rotate-90">
+                                    <circle cx="24" cy="24" r="30" stroke="#e5e7eb" stroke-width="4" fill="none"/>
+                                    <circle id="timerCircle" cx="24" cy="24" r="30" stroke="#3b82f6" stroke-width="4" fill="none" class="timer-circle"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="timerDisplay" class="text-xs font-bold text-gray-700">10:00</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-600 mb-1">Duration:</p>
+                                <div class="flex space-x-1">
+                                    <button class="duration-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-700 border border-indigo-200" data-duration="10">10m</button>
+                                    <button class="duration-btn px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-200" data-duration="30">30m</button>
+                                    <button class="duration-btn px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-200" data-duration="60">1h</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="generateBtn" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all">
+                                <i class="fas fa-plus mr-1"></i>Generate
+                            </button>
+                            <button id="refreshBtn" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all" disabled>
+                                <i class="fas fa-sync mr-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Middle Column - Inbox -->
+                <div class="col-span-5 space-y-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-inbox text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Inbox</h3>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span class="text-xs text-blue-600 font-medium" id="emailCount">0 emails</span>
+                                </div>
+                                <button class="text-xs text-blue-600 hover:text-blue-700 font-medium" id="refreshInboxBtn">
+                                    <i class="fas fa-sync mr-1"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Email List -->
+                        <div class="flex-1 overflow-y-auto" id="emailList">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-3 opacity-50"></i>
+                                <p class="text-sm">No emails yet</p>
+                                <p class="text-xs opacity-75">Generate an email to start receiving messages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Stats & Features -->
+                <div class="col-span-3 space-y-6">
+                    <!-- Stats Cards -->
+                    <div class="space-y-3">
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-green-600">Emails Received</p>
+                                    <p class="text-2xl font-bold text-green-700" id="totalEmailCount">0</p>
+                                </div>
+                                <i class="fas fa-envelope text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-red-50 to-pink-50 p-4 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-red-600">Spam Blocked</p>
+                                    <p class="text-2xl font-bold text-red-700" id="spamCount">0</p>
+                                </div>
+                                <i class="fas fa-shield-alt text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-yellow-600">Security Score</p>
+                                    <p class="text-2xl font-bold text-yellow-700">100%</p>
+                                </div>
+                                <i class="fas fa-lock text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3">Security Features</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-check text-green-500 text-xs"></i>
+                                <span class="text-xs text-gray-600">End-to-end encryption</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-check text-green-500 text-xs"></i>
+                                <span class="text-xs text-gray-600">Auto-destruct emails</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-check text-green-500 text-xs"></i>
+                                <span class="text-xs text-gray-600">No registration required</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-check text-green-500 text-xs"></i>
+                                <span class="text-xs text-gray-600">AI spam protection</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3">Quick Actions</h4>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-download text-gray-600"></i>
+                                <span>Export all emails</span>
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-trash text-gray-600"></i>
+                                <span>Clear inbox</span>
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-cog text-gray-600"></i>
+                                <span>Settings</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-xs"></i>
+                                <span class="text-xs text-gray-600">AI spam protection</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3">Quick Actions</h4>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-download text-gray-600"></i>
+                                <span>Export all emails</span>
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-trash text-gray-600"></i>
+                                <span>Clear inbox</span>
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-xs bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-cog text-gray-600"></i>
+                                <span>Settings</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEmail = null;
+        let timerInterval = null;
+        let currentDuration = 10; // minutes
+        let emailCounter = 0;
+        let spamCounter = 0;
+        let autoEmailInterval = null;
+        
+        // Generate random email
+        function generateEmail() {
+            const domains = ['tempmail.com', 'disposable.email', 'securetemp.net', 'quickmail.org', 'tempbox.net'];
+            const randomString = Math.random().toString(36).substring(2, 10);
+            const domain = domains[Math.floor(Math.random() * domains.length)];
+            return `${randomString}@${domain}`;
+        }
+        
+        // Start timer
+        function startTimer(minutes) {
+            clearInterval(timerInterval);
+            let totalSeconds = minutes * 60;
+            let currentSeconds = totalSeconds;
+            
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerCircle = document.getElementById('timerCircle');
+            
+            timerInterval = setInterval(() => {
+                const mins = Math.floor(currentSeconds / 60);
+                const secs = currentSeconds % 60;
+                timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                const progress = (totalSeconds - currentSeconds) / totalSeconds;
+                const circumference = 2 * Math.PI * 30;
+                const offset = circumference * progress;
+                timerCircle.style.strokeDashoffset = circumference - offset;
+                
+                if (currentSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    autoRefreshEmail();
+                }
+                currentSeconds--;
+            }, 1000);
+        }
+        
+        // Auto refresh email
+        function autoRefreshEmail() {
+            const emailDisplay = document.getElementById('emailDisplay');
+            emailDisplay.textContent = 'Generating new email...';
+            setTimeout(() => {
+                currentEmail = generateEmail();
+                emailDisplay.textContent = currentEmail;
+                startTimer(currentDuration);
+                addSystemMessage('Email auto-refreshed');
+            }, 1500);
+        }
+        
+        // Add system message
+        function addSystemMessage(message) {
+            const emailList = document.getElementById('emailList');
+            if (emailList.children[0].classList.contains('text-center')) {
+                emailList.innerHTML = '';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'bg-blue-100 border-l-4 border-blue-500 p-3 mb-2 rounded slide-in';
+            messageDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-info-circle text-blue-600 text-sm"></i>
+                    <div>
+                        <p class="text-xs font-medium text-blue-800">${message}</p>
+                        <p class="text-xs text-blue-600">${new Date().toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+            emailList.insertBefore(messageDiv, emailList.firstChild);
+        }
+        
+        // Simulate receiving email
+        function simulateEmail() {
+            const emailList = document.getElementById('emailList');
+            if (emailList.children[0].classList.contains('text-center')) {
+                emailList.innerHTML = '';
+            }
+            
+            const senders = ['noreply@github.com', 'support@netflix.com', 'team@discord.com', 'info@amazon.com'];
+            const subjects = ['Verify your account', 'Welcome!', 'Security alert', 'Order confirmation'];
+            
+            const isSpam = Math.random() < 0.25;
+            const sender = senders[Math.floor(Math.random() * senders.length)];
+            const subject = subjects[Math.floor(Math.random() * subjects.length)];
+            
+            const emailDiv = document.createElement('div');
+            emailDiv.className = `bg-white border rounded-lg p-3 mb-2 hover:shadow-sm transition-shadow slide-in ${isSpam ? 'border-red-200' : 'border-gray-200'}`;
+            emailDiv.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-envelope text-white text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-800 truncate">${subject}</p>
+                        <p class="text-xs text-gray-500 truncate">${sender}</p>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        ${new Date().toLocaleTimeString().slice(0, 5)}
+                    </div>
+                    ${isSpam ? '<i class="fas fa-shield-alt text-red-500 text-sm" title="Spam blocked"></i>' : ''}
+                </div>
+            `;
+            emailList.insertBefore(emailDiv, emailList.firstChild);
+            
+            // Update counters
+            if (isSpam) {
+                spamCounter++;
+                document.getElementById('spamCount').textContent = spamCounter;
+            } else {
+                emailCounter++;
+                document.getElementById('totalEmailCount').textContent = emailCounter;
+                document.getElementById('emailCount').textContent = `${emailCounter} emails`;
+            }
+        }
+        
+        // Start auto email simulation
+        function startAutoEmailSimulation() {
+            clearInterval(autoEmailInterval);
+            autoEmailInterval = setInterval(() => {
+                if (currentEmail) {
+                    simulateEmail();
+                }
+            }, 8000 + Math.random() * 12000); // Random interval between 8-20 seconds
+        }
+        
+        // Event listeners
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            currentEmail = generateEmail();
+            document.getElementById('emailDisplay').textContent = currentEmail;
+            document.getElementById('copyBtn').disabled = false;
+            document.getElementById('refreshBtn').disabled = false;
+            startTimer(currentDuration);
+            addSystemMessage('Temporary email generated');
+            startAutoEmailSimulation();
+            
+            // Initial emails
+            setTimeout(() => simulateEmail(), 3000);
+            setTimeout(() => simulateEmail(), 7000);
+        });
+        
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            if (currentEmail) {
+                currentEmail = generateEmail();
+                document.getElementById('emailDisplay').textContent = currentEmail;
+                startTimer(currentDuration);
+                addSystemMessage('Email refreshed');
+            }
+        });
+        
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            if (currentEmail) {
+                navigator.clipboard.writeText(currentEmail);
+                this.classList.add('copy-success');
+                this.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+                setTimeout(() => {
+                    this.classList.remove('copy-success');
+                    this.innerHTML = '<i class="fas fa-copy"></i>';
+                }, 2000);
+            }
+        });
+        
+        document.getElementById('refreshInboxBtn').addEventListener('click', function() {
+            if (currentEmail) {
+                simulateEmail();
+            }
+        });
+        
+        // Duration buttons
+        document.querySelectorAll('.duration-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.duration-btn').forEach(b => {
+                    b.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200');
+                    b.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-200');
+                });
+                this.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-200');
+                this.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-200');
+                
+                currentDuration = parseInt(this.dataset.duration);
+                if (currentEmail) {
+                    startTimer(currentDuration);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
