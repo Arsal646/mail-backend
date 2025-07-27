@@ -40,6 +40,7 @@ class SavedEmail extends Model
     // Get access URL
     public function getAccessUrlAttribute()
     {
-        return config('app.url') . '/saved/' . $this->access_token;
+        return env('APP_WEBURL', 'http://localhost') . '/saved/' . $this->access_token;
     }
+
 }
