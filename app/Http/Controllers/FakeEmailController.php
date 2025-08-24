@@ -19,7 +19,7 @@ class FakeEmailController extends Controller
     $email = $request->query('email');
 
     if ($email) {
-        return FakeEmail::where('to_email', $email)->get();
+        return FakeEmail::where('to_email', 'LIKE', "%$email%")->get();
     }
 
     return FakeEmail::all();
