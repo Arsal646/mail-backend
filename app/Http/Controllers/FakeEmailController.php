@@ -40,4 +40,16 @@ public function store(Request $r)
     return FakeEmail::create($data);
 }
 
+public function getTotalCount(Request $request)
+{
+    $date = $request->query('date') ? $request->query('date') : today();
+    
+    $count = FakeEmail::whereDate('created_at', $date)->count();
+    
+    return response()->json([
+        'count' => $count,
+        'date' => is_string($date) ? $date : $date->format('Y-m-d')
+    ]);
+}
+
 }

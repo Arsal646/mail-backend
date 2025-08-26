@@ -26,5 +26,6 @@ Route::post('/check-saved', [SavedEmailController::class, 'checkSaved']);
 
 Route::post('/fakeemails', [FakeEmailController::class, 'store']);
 Route::get('/fakeemails', [FakeEmailController::class, 'index']);
+Route::get('/fakeemails/count', [FakeEmailController::class, 'getTotalCount']);
 
 
