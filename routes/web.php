@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,13 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome');
 
-
-
-
-
-
-
+Route::get('/admin/mail-dashboard', [DashboardController::class, 'index'])
+    ->name('admin.dashboard')
+    ->middleware('dashboard.token');

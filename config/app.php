@@ -124,6 +124,7 @@ return [
     'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',
+    'dashboard_token' => env('DASHBOARD_TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
