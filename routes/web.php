@@ -19,3 +19,6 @@ Route::view('/', 'welcome');
 Route::get('/admin/mail-dashboard', [DashboardController::class, 'index'])
     ->name('admin.dashboard')
     ->middleware('dashboard.token');
+
+Route::get('/admin/mail-dashboard/open', [DashboardController::class, 'index'])
+    ->name('admin.dashboard.open');

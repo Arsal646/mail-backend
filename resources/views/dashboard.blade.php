@@ -7,6 +7,17 @@
     <style>
         :root {
             color-scheme: light;
+            --bg: #f5f6f7;
+            --surface: #ffffff;
+            --surface-alt: #f9fafb;
+            --border: #d1d5db;
+            --text-strong: #111827;
+            --text-muted: #6b7280;
+            --accent: #111827;
+            --accent-light: rgba(17, 24, 39, 0.08);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 12px rgba(17, 24, 39, 0.08);
         }
         * {
             box-sizing: border-box;
@@ -14,265 +25,325 @@
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f5f6f8;
-            color: #1f2933;
+            background: var(--bg);
+            color: var(--text-strong);
         }
-        .page {
-            min-height: 100vh;
-            padding: 24px 18px 32px;
+        .app {
+            width: min(92%, 720px);
+            margin: 0 auto;
+            padding: 20px 0 64px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 16px;
         }
-        .header h1 {
+        .hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .hero h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
         }
-        .header p {
-            margin: 6px 0 0;
-            color: #64748b;
+        .hero p {
+            margin: 0;
             font-size: 14px;
+            color: var(--text-muted);
         }
-        .date-filter {
-            background: #fff;
-            border-radius: 14px;
-            padding: 18px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        .filter-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px 18px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-        .date-filter label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-        }
-        .date-filter__controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .date-filter input[type="date"] {
-            flex: 1 1 160px;
-            border: 1px solid #d0d7e2;
-            border-radius: 10px;
-            padding: 12px 14px;
-            font-size: 15px;
-            color: #0f172a;
-            background: #fff;
-        }
-        .date-filter button {
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            background: #2563eb;
-            color: #fff;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.22);
-            cursor: pointer;
-        }
-        .date-filter button:focus,
-        .date-filter button:hover {
-            background: #1d4fd8;
-        }
-        .date-filter__reset {
-            font-size: 14px;
-            font-weight: 500;
-            color: #64748b;
-            text-decoration: none;
-            padding: 8px 12px;
-        }
-        .filters {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-        }
-        .filters a {
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid #d0d7e2;
-            color: #1f2933;
-            font-weight: 500;
-            transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
-        }
-        .filters a.active {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.22);
-        }
-        .card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 20px 18px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .metric-title {
-            margin: 0;
-            color: #64748b;
-            font-size: 14px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-        .metric-value {
-            margin: 0;
-            font-size: 42px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .metric-caption {
-            margin: 0;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .list {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-        }
-        .list header {
-            padding: 18px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .list header h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        .list header p {
-            margin: 6px 0 0;
-            font-size: 13px;
-            color: #64748b;
-        }
-        .list ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .list li {
+        .filter-card__legend {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 18px;
-            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--text-muted);
         }
-        .list li:last-child {
-            border-bottom: none;
+        .filter-card__controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
         }
-        .list .email,
-        .list .domain {
+        .filter-card input[type="date"] {
+            grid-column: span 2;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
             font-size: 15px;
-            font-weight: 500;
-            color: #0f172a;
-            word-break: break-word;
-            max-width: 75%;
+            color: var(--text-strong);
+            background: var(--surface-alt);
         }
-        .list .count {
+        .filter-card input[type="date"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        .filter-card button {
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 15px;
+            font-weight: 600;
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .filter-card__reset {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+        .filters a {
+            flex: 0 0 auto;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        .filters a.active {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+        .metric-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .metric-card__title {
+            margin: 0;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .metric-card__value {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 600;
+        }
+        .metric-card__caption {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .panel header h2 {
+            margin: 0;
             font-size: 16px;
             font-weight: 600;
-            color: #2563eb;
         }
-        .empty {
-            text-align: center;
-            padding: 32px 18px;
-            color: #94a3b8;
+        .panel header p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .panel ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .panel li {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .panel li:last-child {
+            border-bottom: none;
+        }
+        .panel .label {
             font-size: 14px;
+            font-weight: 500;
+            color: var(--text-strong);
+            word-break: break-word;
+            max-width: 70%;
         }
-        @media (min-width: 768px) {
-            .page {
-                max-width: 680px;
-                margin: 0 auto;
-                padding-top: 48px;
+        .panel .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-strong);
+        }
+        .panel .empty {
+            padding: 12px 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        @media (min-width: 520px) {
+            .filter-card__controls {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
             }
-            .header h1 {
-                font-size: 28px;
+            .filter-card input[type="date"] {
+                grid-column: span 2;
+            }
+            .filter-card button {
+                grid-column: auto;
+            }
+        }
+        @media (min-width: 640px) {
+            .panel-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
     </style>
 </head>
 <body>
 @php $tokenParam = request('token'); @endphp
-<div class="page">
-    <header class="header">
+<div class="app">
+    <header class="hero">
         <h1>Email Dashboard</h1>
         <p>Showing activity for {{ strtolower($rangeLabel) }}.</p>
     </header>
 
-    <form class="date-filter" method="GET" action="{{ route('admin.dashboard') }}">
-        <label for="date">Filter by date</label>
-        <div class="date-filter__controls">
+    <form class="filter-card" method="GET" action="{{ route('admin.dashboard.open') }}">
+        <div class="filter-card__legend">
+            <span>Filter by date</span>
+            @if ($selectedDate)
+                <a class="filter-card__reset" href="{{ route('admin.dashboard.open', ['range' => 'day', 'token' => $tokenParam]) }}">Reset</a>
+            @endif
+        </div>
+        <div class="filter-card__controls">
             <input type="date" id="date" name="date" value="{{ $selectedDate }}" max="{{ $maxDate }}">
             @if ($tokenParam)
                 <input type="hidden" name="token" value="{{ $tokenParam }}">
             @endif
             <button type="submit">Apply</button>
-            @if ($selectedDate)
-                <a class="date-filter__reset" href="{{ route('admin.dashboard', ['range' => 'day', 'token' => $tokenParam]) }}">Reset</a>
-            @endif
         </div>
     </form>
 
     <nav class="filters" aria-label="Time range filters">
         @foreach ($rangeOptions as $key => $label)
-            <a href="{{ route('admin.dashboard', ['range' => $key, 'token' => $tokenParam]) }}" class="{{ $range === $key ? 'active' : '' }}">{{ $label }}</a>
+            <a href="{{ route('admin.dashboard.open', ['range' => $key, 'token' => $tokenParam]) }}" class="{{ $range === $key ? 'active' : '' }}">{{ $label }}</a>
         @endforeach
     </nav>
 
-    <section class="card" role="status">
-        <p class="metric-title">Total received</p>
-        <p class="metric-value">{{ number_format($totalCount) }}</p>
-        <p class="metric-caption">Messages captured in the selected range.</p>
-    </section>
+    <div class="metric-strip">
+        <section class="metric-card">
+            <p class="metric-card__title">Total received</p>
+            <p class="metric-card__value">{{ number_format($totalCount) }}</p>
+            <p class="metric-card__caption">Messages captured in the selected range.</p>
+        </section>
+        @if ($busiestDay)
+            <section class="metric-card">
+                <p class="metric-card__title">Busiest date</p>
+                <p class="metric-card__value">{{ number_format($busiestDay['total']) }}</p>
+                <p class="metric-card__caption">Arrived on {{ $busiestDay['label'] }}.</p>
+            </section>
+        @endif
+    </div>
 
-    <section class="list">
-        <header>
-            <h2>Top sender domains</h2>
-            <p>Where messages are coming from most often.</p>
-        </header>
-        @if ($hasTopDomains)
+    @if ($showDatewiseCounts)
+        <section class="panel">
+            <header>
+                <h2>Daily email volume</h2>
+                <p>Messages received for each day in this range.</p>
+            </header>
             <ul>
-                @foreach ($topDomains as $domain)
+                @foreach ($datewiseCounts as $item)
                     <li>
-                        <span class="domain">{{ $domain->domain }}</span>
-                        <span class="count">x{{ $domain->total }}</span>
+                        <span class="label">{{ $item['label'] }}</span>
+                        <span class="value">x{{ number_format($item['total']) }}</span>
                     </li>
                 @endforeach
             </ul>
-        @else
-            <div class="empty">No sender domain activity in this range.</div>
-        @endif
-    </section>
+        </section>
+    @endif
 
-    <section class="list">
-        <header>
-            <h2>Repeated recipients</h2>
-            <p>Email addresses triggered more than once.</p>
-        </header>
-        @if ($hasRepeatAddresses)
-            <ul>
-                @foreach ($repeatAddresses as $item)
-                    <li>
-                        <span class="email">{{ $item->to_email }}</span>
-                        <span class="count">x{{ $item->total }}</span>
-                    </li>
-                @endforeach
-            </ul>
-        @else
-            <div class="empty">No repeated email activity in this range.</div>
-        @endif
-    </section>
+    <div class="panel-grid">
+        <section class="panel">
+            <header>
+                <h2>Top sender domains</h2>
+                <p>Where messages are coming from most often.</p>
+            </header>
+            @if ($hasTopDomains)
+                <ul>
+                    @foreach ($topDomains as $domain)
+                        <li>
+                            <span class="label">{{ $domain->domain }}</span>
+                            <span class="value">x{{ number_format($domain->total) }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="empty">No sender domain activity in this range.</div>
+            @endif
+        </section>
+
+        <section class="panel">
+            <header>
+                <h2>Repeated recipients</h2>
+                <p>Email addresses triggered more than once.</p>
+            </header>
+            @if ($hasRepeatAddresses)
+                <ul>
+                    @foreach ($repeatAddresses as $item)
+                        <li>
+                            <span class="label">{{ $item->to_email }}</span>
+                            <span class="value">x{{ number_format($item->total) }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="empty">No repeated email activity in this range.</div>
+            @endif
+        </section>
+    </div>
 </div>
 </body>
 </html>

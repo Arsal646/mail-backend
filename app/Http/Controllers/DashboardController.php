@@ -77,6 +77,23 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $dailyCounts = (clone $filteredQuery)
+            ->selectRaw("DATE(created_at) as date, COUNT(*) as total")
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function ($row) {
+                $date = Carbon::parse($row->date);
+                return [
+                    'date' => $date->toDateString(),
+                    'label' => $date->format('M j, Y'),
+                    'total' => (int) $row->total,
+                ];
+            })
+            ->values();
+
+        $busiestDay = $dailyCounts->sortByDesc('total')->first();
+        $showDatewiseCounts = $dailyCounts->count() > 1;
         $rangeOptions = [
             'day' => 'Day',
             'week' => 'Week',
@@ -92,8 +109,13 @@ class DashboardController extends Controller
             'hasRepeatAddresses' => $repeatAddresses->isNotEmpty(),
             'topDomains' => $topDomains,
             'hasTopDomains' => $topDomains->isNotEmpty(),
+            'busiestDay' => $busiestDay,
+            'datewiseCounts' => $dailyCounts,
+            'showDatewiseCounts' => $showDatewiseCounts,
             'selectedDate' => $selectedDate ? $selectedDate->toDateString() : '',
             'maxDate' => $maxDate,
         ]);
     }
 }
+
+
